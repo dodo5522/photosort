@@ -1,2 +1,0 @@
-flickrapi
-ExifRead
