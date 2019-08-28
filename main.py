@@ -1,4 +1,3 @@
-#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
@@ -19,7 +18,10 @@ TAG_DATE_TIME = 'EXIF DateTimeOriginal'
 
 
 def init_args(args=sys.argv[1:]):
-    parser = argparse.ArgumentParser(description='This script to make directory of date which the photo is taken, and move the photo into the directory.')
+    parser = argparse.ArgumentParser(
+        description='''
+            This script to make directory of date which the photo is taken,
+            and move the photo into the directory.''')
     parser.add_argument(
         'path_root_src',
         action='store',
@@ -38,14 +40,16 @@ def init_args(args=sys.argv[1:]):
         default='',
         type=str,
         choices=None,
-        help='Directory path where you want to create date folder and locate photo files. (default: same as source directory)',
+        help='''
+            Directory path where you want to create date folder and locate
+            photo files. (default: same as source directory)''',
         metavar=None)
     parser.add_argument(
         '-p', '--sort-photo-extentions',
         action='store',
         nargs='+',
         const=None,
-        default=(),
+        default=('jpg',),
         type=str,
         choices=None,
         help='Extentions of photo file which you want to sort. (default: jpg)',
@@ -55,10 +59,10 @@ def init_args(args=sys.argv[1:]):
         action='store',
         nargs='+',
         const=None,
-        default=(),
+        default=('mov',),
         type=str,
         choices=None,
-        help='Extentions of video file which you want to sort. (default: jpg)',
+        help='Extentions of video file which you want to sort. (default: mov)',
         metavar=None)
     parser.add_argument(
         '-l', '--delimiter',
@@ -67,7 +71,9 @@ def init_args(args=sys.argv[1:]):
         type=str,
         choices=None,
         required=False,
-        help='A character as delimiter which you want to set the name of date folder like "2014-05-01". (default: none)',
+        help='''
+            A character as delimiter which you want to set the name of date
+            folder like "2014-05-01". (default: none)''',
         metavar=None)
     parser.add_argument(
         '--subdir-year',
@@ -94,7 +100,12 @@ def init_args(args=sys.argv[1:]):
         type=str,
         choices=None,
         required=False,
-        help='Function to be callback when copying/moving a photo finished. The format is like "/User/takashi/flickr_uploader/flickr_uploader:upload?key=xxx&param=yyy". The "upload" function should have an argument "path_to_photo_uploading" as first and another args is passed to keyword arguments. (default: none)',
+        help='''
+            Function to be callback when copying/moving a photo finished. The
+            format is like "/User/takashi/flickr_uploader/flickr_uploader:up-
+            load?key=xxx&param=yyy". The "upload" function should have an
+            argument "path_to_photo_uploading" as first and another args is
+            passed to keyword arguments. (default: none)''',
         metavar=None)
     parser.add_argument(
         '--debug',
@@ -123,33 +134,43 @@ class SortFiles(object):
         logging.debug("_path_root_src : " + self._path_root_src)
         logging.debug("_path_root_dst : " + self._path_root_dst)
         logging.debug("_delimiter : " + self._delimiter)
-        logging.debug("_subdir : " + ','.join([str(subdir) for subdir in self._subdir]))
+        logging.debug("_subdir : " + ','.join(
+            [str(s) for s in self._subdir]))
 
         callback_full = kwargs.get('callback_function')
-        self._callback_module_path = os.path.dirname(callback_full) if callback_full else ""
-        self._callback_module = os.path.basename(callback_full).split(":")[0] if callback_full else ""
-        self._callback_function = os.path.basename(callback_full).split(":")[1].split("?")[0] if callback_full else ""
+        self._callback_module_path = os.path.dirname(
+            callback_full) if callback_full else ""
+        self._callback_module = os.path.basename(callback_full).split(
+            ":")[0] if callback_full else ""
+        self._callback_function = os.path.basename(callback_full).split(
+            ":")[1].split("?")[0] if callback_full else ""
 
         self._callback_kwargs = {}
         if callback_full and len(os.path.basename(callback_full).split(":")[1].split("?")) >= 2:
-            kw_strs = os.path.basename(callback_full).split(":")[1].split("?")[1].split("&")
-            self._callback_kwargs = {kw_str.split("=")[0]: kw_str.split("=")[1] for kw_str in kw_strs}
+            kw_strs = os.path.basename(callback_full).split(
+                ":")[1].split("?")[1].split("&")
+            self._callback_kwargs = {kw_str.split("=")[0]: kw_str.split(
+                "=")[1] for kw_str in kw_strs}
 
-        logging.debug("callback_module_path : {}".format(self._callback_module_path))
+        logging.debug("callback_module_path : {}".format(
+            self._callback_module_path))
         logging.debug("callback_module : {}".format(self._callback_module))
         logging.debug("callback_function : {}".format(self._callback_function))
 
     def get_date_of_file(self, path_file_src):
         epoc_time = os.stat(path_file_src)
         mtime = time.gmtime(epoc_time.st_mtime)
-        date = '{year:04d}-{month:02d}-{day:02d}'.format(year=mtime.tm_year, month=mtime.tm_mon, day=mtime.tm_mday)
-        logging.debug('{file_src} has {mtime}.'.format(file_src=path_file_src, mtime=mtime))
+        date = '{year:04d}-{month:02d}-{day:02d}'.format(
+            year=mtime.tm_year, month=mtime.tm_mon, day=mtime.tm_mday)
+        logging.debug('{file_src} has {mtime}.'.format(
+            file_src=path_file_src, mtime=mtime))
         return date
 
     def sort_files(self):
         for extention in self._ext_src:
             pattern_search = '*.{0}'.format(extention)
-            paths_src_img = glob.glob(os.path.join(self._path_root_src, pattern_search))
+            paths_src_img = glob.glob(os.path.join(
+                self._path_root_src, pattern_search))
 
             for path_src_img in paths_src_img:
                 if not os.path.isfile(path_src_img):
@@ -185,9 +206,11 @@ class SortFiles(object):
                 # nearly same directory exists, use it.
                 path_dst_dir = os.path.join(path_dst_dir, date)
                 path_dst_dirs = glob.glob("{0}*".format(path_dst_dir))
-                path_dst_dir = path_dst_dirs[0] if len(path_dst_dirs) else path_dst_dir
+                path_dst_dir = path_dst_dirs[0] if len(
+                    path_dst_dirs) else path_dst_dir
 
-                path_dst_img = os.path.join(path_dst_dir, os.path.basename(path_src_img))
+                path_dst_img = os.path.join(
+                    path_dst_dir, os.path.basename(path_src_img))
 
                 # create directory to move.
                 if not os.path.isdir(path_dst_dir):
