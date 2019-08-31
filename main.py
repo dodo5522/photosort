@@ -48,22 +48,14 @@ def init_args(args=sys.argv[1:]):
         '-p', '--sort-photo-extentions',
         action='store',
         nargs='+',
-        const=None,
-        default=('jpg',),
         type=str,
-        choices=None,
-        help='Extentions of photo file which you want to sort. (default: jpg)',
-        metavar=None)
+        help='Extentions of photo file which you want to sort like "jpg png"')
     parser.add_argument(
         '-v', '--sort-video-extentions',
         action='store',
         nargs='+',
-        const=None,
-        default=('mov',),
         type=str,
-        choices=None,
-        help='Extentions of video file which you want to sort. (default: mov)',
-        metavar=None)
+        help='Extentions of video file which you want to sort like "mov mpg"')
     parser.add_argument(
         '-l', '--delimiter',
         action='store',
@@ -294,7 +286,7 @@ if __name__ == '__main__':
 
         obj_sort = []
 
-        if len(args.sort_photo_extentions):
+        if args.sort_photo_extentions:
             obj_sort.append(SortPhotoFiles(
                 path_root_src=args.path_root_src,
                 path_root_dst=args.path_root_dst,
@@ -306,7 +298,7 @@ if __name__ == '__main__':
                 is_copy=args.copy,
                 callback_function=args.callback_function))
 
-        if len(args.sort_video_extentions):
+        if args.sort_video_extentions:
             obj_sort.append(SortVideoFiles(
                 path_root_src=args.path_root_src,
                 path_root_dst=args.path_root_dst,
