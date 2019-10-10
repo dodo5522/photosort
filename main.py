@@ -314,6 +314,3 @@ if __name__ == '__main__':
     except Exception as err:
         traceback.print_exc()
         sys.exit(1)
-
-    finally:
-        pass
