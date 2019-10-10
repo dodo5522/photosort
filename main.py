@@ -19,9 +19,7 @@ TAG_DATE_TIME = 'EXIF DateTimeOriginal'
 
 def init_args(args=sys.argv[1:]):
     parser = argparse.ArgumentParser(
-        description='''
-            This script to make directory of date which the photo is taken,
-            and move the photo into the directory.''')
+        description='This script to make directory of date which the photo is taken, and move the photo into the directory.')
     parser.add_argument(
         'path_root_src',
         action='store',
